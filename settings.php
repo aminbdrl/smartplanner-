@@ -1,27 +1,14 @@
 <?php
-    ob_start();
-    session_start();
-    
-    include_once(dirname(__FILE__) . "/include/config.php");
-    include_once(dirname(__FILE__) . "/include/function.php");
+require_once __DIR__ . '/includes/bootstrap.php';
 
-    // Enforce CTO Zelozz-style login guard
-    if (!isset($_SESSION["portal"]["user"]) || empty($_SESSION["portal"]["user"]["id"])) {
-        header("Location: login.php");
-        exit();
-    }
+smartwills_require_login();
 
-    $activePage = 'settings';
-    $pageTitle = 'Settings - SmartWills';
-    $pageStyles = ['settings.css'];
-    $pageScripts = ['settings.js'];
+$activePage = 'settings';
+$pageTitle = 'Settings - SmartWills';
+$pageStyles = ['settings.css'];
+$pageScripts = ['settings.js'];
 
-    // Retrieve logged-in user's session data dynamically
-    $userId = $_SESSION["portal"]["user"]["id"] ?? '';
-    $userName = $_SESSION["portal"]["user"]["name"] ?? '';
-    $userEmail = $_SESSION["portal"]["user"]["email"] ?? '';
-
-    include __DIR__ . '/layouts/header.php';
+include __DIR__ . '/layouts/header.php';
 ?>
 <div class="wrapper">
     <?php include __DIR__ . '/layouts/sidebar.php'; ?>
@@ -74,7 +61,7 @@
                     <form class="settings-form" data-demo-message="Personal information saved (demo)">
                         <div class="setting-row">
                             <span class="label"><i class="fas fa-user"></i> Full Name</span>
-                            <input type="text" placeholder="Enter your full name" value="<?php echo htmlspecialchars($userName); ?>">
+                            <input type="text" placeholder="Enter your full name" value="John Doe">
                         </div>
                         <div class="setting-row">
                             <span class="label"><i class="fas fa-birthday-cake"></i> Date of Birth</span>
@@ -82,11 +69,11 @@
                         </div>
                         <div class="setting-row">
                             <span class="label"><i class="fas fa-id-badge"></i> Account ID</span>
-                            <input type="text" value="SW-<?php echo htmlspecialchars($userId); ?>" readonly>
+                            <input type="text" value="SW-10001" readonly>
                         </div>
                         <div class="setting-row">
                             <span class="label"><i class="fas fa-envelope"></i> Email</span>
-                            <input type="email" placeholder="Enter your email" value="<?php echo htmlspecialchars($userEmail); ?>">
+                            <input type="email" placeholder="Enter your email" value="john.doe@example.com">
                         </div>
                         <div class="btn-group">
                             <button type="submit" class="btn btn-primary">
