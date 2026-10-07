@@ -6,7 +6,39 @@ smartwills_require_login();
 $activePage = 'profile';
 $pageTitle = 'My Profile - SmartWills';
 $pageStyles = ['profile.css'];
-$pageScripts = ['profile.js'];
+
+// Fetch current user details from Database
+$userId = $_SESSION['user_id'] ?? $_SESSION['portal']['user']['id'] ?? 0;
+$userData = null;
+
+if ($userId > 0) {
+    $escapedId = (int)$userId;
+    $res = $db->query("SELECT * FROM users WHERE id = $escapedId LIMIT 1");
+    if ($res && $res->num_rows > 0) {
+        $userData = $res->rows[0];
+    }
+}
+
+// Map user values with fallbacks
+$fullName    = $userData['name'] ?? ($_SESSION['user_name'] ?? 'User');
+$email       = $userData['email'] ?? ($_SESSION['user_email'] ?? '-');
+$phone       = $userData['phone'] ?? '';
+$role        = !empty($userData['role']) ? ucfirst($userData['role']) : 'Admin';
+
+$bankName    = $userData['bank_name'] ?? '';
+$bankAccount = $userData['bank_account_no'] ?? '';
+$bankHolder  = $userData['bank_account_holder'] ?? '';
+$bankSwift   = $userData['bank_swift'] ?? '';
+
+// Generate Avatar Initials
+$words = explode(' ', trim($fullName));
+$initials = '';
+foreach ($words as $w) {
+    if (!empty($w)) {
+        $initials .= strtoupper($w[0]);
+    }
+}
+$avatarInitials = substr($initials, 0, 2) ?: 'U';
 
 include __DIR__ . '/layouts/header.php';
 ?>
@@ -18,73 +50,76 @@ include __DIR__ . '/layouts/header.php';
 
         <div class="content">
             <header class="profile-header">
-                <div class="avatar">JD</div>
+                <div class="avatar"><?php echo htmlspecialchars($avatarInitials); ?></div>
                 <div class="greeting">
                     <h1>My Profile</h1>
-                    <p><i class="fas fa-user-check"></i> Welcome back, John Doe</p>
+                    <p><i class="fas fa-user-check"></i> Welcome back, <?php echo htmlspecialchars($fullName); ?></p>
                 </div>
             </header>
 
             <section class="profile-grid" aria-label="Profile information">
+                <!-- Personal Information -->
                 <article class="profile-card">
                     <div class="card-header">
                         <i class="fas fa-id-card"></i>
                         Personal Information
                     </div>
                     <div class="info-row">
-                        <span class="label">Full Name</span>
-                        <span class="value">John Doe</span>
+                        <span class="label">FULL NAME</span>
+                        <span class="value"><?php echo htmlspecialchars($fullName); ?></span>
                     </div>
                     <div class="info-row">
-                        <span class="label">Email</span>
-                        <span class="value"><i class="fas fa-envelope"></i> john.doe@example.com</span>
+                        <span class="label">EMAIL</span>
+                        <span class="value"><i class="fas fa-envelope"></i> <?php echo htmlspecialchars($email); ?></span>
                     </div>
                     <div class="info-row">
-                        <span class="label">Phone</span>
-                        <span class="value"><i class="fas fa-phone"></i> +60 12-3456789</span>
+                        <span class="label">PHONE</span>
+                        <span class="value"><i class="fas fa-phone"></i> <?php echo htmlspecialchars($phone ?: 'Not set'); ?></span>
                     </div>
                     <div class="info-row">
-                        <span class="label">Role</span>
-                        <span class="value"><i class="fas fa-user-tag"></i> Administrator</span>
+                        <span class="label">ROLE</span>
+                        <span class="value"><i class="fas fa-user-tag"></i> <?php echo htmlspecialchars($role); ?></span>
                     </div>
                     <div class="btn-group">
-                        <button class="btn btn-primary" data-demo-message="Update Profile (demo)">
+                        <a href="edit_profile.php" class="btn btn-primary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
                             <i class="fas fa-edit"></i>
                             Update Profile
-                        </button>
+                        </a>
                     </div>
                 </article>
 
+                <!-- Bank Account Information -->
                 <article class="profile-card">
                     <div class="card-header">
                         <i class="fas fa-university"></i>
                         Bank Account Information
                     </div>
                     <div class="info-row">
-                        <span class="label">Bank Name</span>
-                        <span class="value"><i class="fas fa-building"></i> Maybank</span>
+                        <span class="label">BANK NAME</span>
+                        <span class="value"><i class="fas fa-building"></i> <?php echo htmlspecialchars($bankName ?: 'Not set'); ?></span>
                     </div>
                     <div class="info-row">
-                        <span class="label">Account Number</span>
-                        <span class="value"><i class="fas fa-credit-card"></i> 1234 5678 9012</span>
+                        <span class="label">ACCOUNT NUMBER</span>
+                        <span class="value"><i class="fas fa-credit-card"></i> <?php echo htmlspecialchars($bankAccount ?: 'Not set'); ?></span>
                     </div>
                     <div class="info-row">
-                        <span class="label">Account Holder</span>
-                        <span class="value">John Doe</span>
+                        <span class="label">ACCOUNT HOLDER</span>
+                        <span class="value"><?php echo htmlspecialchars($bankHolder ?: 'Not set'); ?></span>
                     </div>
                     <div class="info-row">
-                        <span class="label">SWIFT Code</span>
-                        <span class="value">MBBEMYKL</span>
+                        <span class="label">SWIFT CODE</span>
+                        <span class="value"><?php echo htmlspecialchars($bankSwift ?: 'Not set'); ?></span>
                     </div>
                     <div class="btn-group">
-                        <button class="btn btn-outline" data-demo-message="Manage Bank Account (demo)">
+                        <a href="edit_bank.php" class="btn btn-outline" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
                             <i class="fas fa-cog"></i>
                             Manage Account
-                        </button>
+                        </a>
                     </div>
                 </article>
             </section>
         </div>
     </main>
 </div>
+
 <?php include __DIR__ . '/layouts/footer.php'; ?>

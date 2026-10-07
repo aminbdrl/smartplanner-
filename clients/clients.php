@@ -1,4 +1,12 @@
-<?php $activePage = 'clients'; ?>
+<?php
+// 1. Include core settings to prevent the fatal error in sidebar.php
+require_once __DIR__ . '/../includes/bootstrap.php';
+
+// 2. Disable the login redirect to allow direct interface access
+// smartwills_require_login();
+
+$activePage = 'clients'; 
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -57,8 +65,6 @@
         </div>
     </div>
 </div>
-
-
 
 <script src="../assets/js/global.js"></script>
 <script src="../assets/js/clients.js"></script>

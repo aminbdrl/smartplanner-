@@ -1,14 +1,25 @@
 <?php
-require_once __DIR__ . '/includes/bootstrap.php';
+    ob_start();
+    session_start();
+    
+    // Load central bootstrap configuration & DB wrapper
+    require_once __DIR__ . '/includes/bootstrap.php';
 
-smartwills_require_login();
+    // Enforce login guard
+    if (!isset($_SESSION["portal"]["user"]) || empty($_SESSION["portal"]["user"]["id"])) {
+        header("Location: login.php");
+        exit();
+    }
 
-$activePage = 'dashboard';
-$pageTitle = 'SmartWill Planner · Dashboard';
-$pageStyles = ['index.css'];
-$pageScripts = ['index.js'];
+    $activePage = 'dashboard';
+    $pageTitle = 'SmartWill Planner · Dashboard';
+    $pageStyles = ['index.css'];
+    $pageScripts = ['index.js'];
 
-include __DIR__ . '/layouts/header.php';
+    // Retrieve logged-in user's name dynamically
+    $userName = $_SESSION["portal"]["user"]["name"] ?? 'User';
+
+    include __DIR__ . '/layouts/header.php';
 ?>
 <div class="wrapper">
     <?php include __DIR__ . '/layouts/sidebar.php'; ?>
@@ -17,7 +28,7 @@ include __DIR__ . '/layouts/header.php';
         <div class="content">
             <div class="hero-banner">
                 <h5>DASHBOARD</h5>
-                <h1>Welcome back, Sarah 👋</h1>
+                <h1>Welcome back, <?php echo htmlspecialchars($userName); ?> 👋</h1>
                 <p>Here's an overview of your estate planning portal today.</p>
                 <div class="date-badge"><i class="far fa-calendar-alt"></i> <span id="realTimeDate">----Year--Month--Day</span></div>
             </div>
